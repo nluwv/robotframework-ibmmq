@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools == 75.4.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robotframework-uwv-mqlibrary"
+version = "0.1.1"
+authors = [
+  { name="Niels Janssen", email="niels.janssen@uwv.nl" },
+]
+maintainers = [
+  { name="Niels Janssen", email="niels.janssen@uwv.nl" },
+]
+description = "A Robotframework library for generation of test data"
+keywords = ["robotframework", "ibm", "mqlibrary"]
+readme = "README.md"
+requires-python = ">=3.9.0"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Test engineers",
+    "Topic :: Software development :: Testing",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "robotframework",
+  "pyaml",
+  "ibmmq"
+]
+
+[project.optional-dependencies]
+deploy = ["twine", "build", "wheel"]
+
+[project.urls]
+Homepage = "https://azuredevops.ba.uwv.nl/UWV/TAF/_git/uwv-robotframework-mqlibrary"

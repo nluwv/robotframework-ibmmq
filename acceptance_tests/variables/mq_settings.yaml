@@ -1,0 +1,7 @@
+# Place your applicable environment values into these IBM MQ settings 
+MQ_MANAGER:   <replace with your queue manager name>    
+MQ_HOSTNAME:  <replace with the hostname of your MQ server>
+MQ_PORT:  <replace with the port number for your MQ server>
+MQ_CHANNEL:  <replace with the channel name for your MQ server>
+MQ_USERNAME:  <replace with the username which has read and write access rights>
+MQ_PASSWORD:  <replace with appropriate password>

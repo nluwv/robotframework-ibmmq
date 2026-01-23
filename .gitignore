@@ -1,0 +1,12 @@
+__pycache__
+log.html
+output.xml
+report.html
+.venv
+.vscode
+.mypy_cache
+build
+dist
+*.egg-info
+results
+.python-version
