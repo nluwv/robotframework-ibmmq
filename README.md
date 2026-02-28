@@ -16,8 +16,6 @@ Er zijn nogal wat afhankelijkheden met andere componenten die je eerst moet inst
    ✅ Windows 11 SDK (v10.0.26...)
 6. Start installatie: Klik rechtsonder op Modify om de installatie te starten.
 
-# 📦 Stap 2 — Voeg de interne Python package-index toe
-Meer informatie staat hier: [UWV python package index](https://uwv.atlassian.net/wiki/spaces/TPM/pages/185041187/UWV+python+package+index) 
 
 
 <!-- 
@@ -28,10 +26,10 @@ CMake (Wheel builder): Download via https://cmake.org/download/ ➤ Gebruik cmak
 -->
 
 
-# 📥 Stap 3 — Installeer de UWV MQ Library
+# 📥 Stap 2 — Installeer de IBMMQLibrary
 1. Open een nieuw terminalvenster
 2. Voer de installatie uit:
-`pip install robotframework-uwv-mqlibrary`
+`pip install robotframework-ibmmq`
 
 
 # 🔐 Extra — MQ Administrator kanaal activeren (alleen indien nodig)
@@ -40,13 +38,11 @@ CMake (Wheel builder): Download via https://cmake.org/download/ ➤ Gebruik cmak
 3. Zorg dat de channel én listener bestaan én actief zijn
 4. Gebruik SYSTEM.ADMIN.SVRCONN als channel bij het verbinden
 
-## Aanmaken test
 
-Voorbeeld:
 
 
 *** Settings ***
-Library   MQLibrary
+Library   IBMMQLibrary
 
 *** Test cases ***
 Test connect MQ

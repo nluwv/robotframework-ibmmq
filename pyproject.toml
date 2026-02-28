@@ -3,7 +3,7 @@ requires = ["setuptools == 75.4.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "robotframework-uwv-mqlibrary"
+name = "robotframework-ibmmq"
 version = "0.1.1"
 authors = [
   { name="Niels Janssen", email="niels.janssen@uwv.nl" },
@@ -20,17 +20,25 @@ classifiers = [
     "Intended Audience :: Test engineers",
     "Topic :: Software development :: Testing",
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
     "Operating System :: OS Independent",
 ]
 dependencies = [
-  "robotframework",
-  "pyaml",
-  "ibmmq"
+    "robotframework (>=7.3.0,<8.3.0)",
+    "ibmmq (>=2.0.0,<3.0.0)"
 ]
+
+[dependency-groups]
+dev = [
+    "pyyaml>=6.0.3",
+]
+
 
 [project.optional-dependencies]
 deploy = ["twine", "build", "wheel"]
 
 [project.urls]
-Homepage = "https://azuredevops.ba.uwv.nl/UWV/TAF/_git/uwv-robotframework-mqlibrary"
+Homepage = "https://github.com/nluwv/robotframework-ibmmq"
+Documentation = "https://readthedocs.org"
+Repository = "https://github.com/nluwv/robotframework-ibmmq.git"
+Issues = "https://github.com/nluwv/robotframework-ibmmq/issues"
