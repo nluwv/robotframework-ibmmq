@@ -19,7 +19,7 @@ def _new_md() -> ibmmq.MD:
 @library
 class IBMMQLibrary:
     """
-    MQLibrary - A Robot Framework Library for IBM MQ Integration with multi-alias connection support.
+    IBMMQLibrary - A Robot Framework Library for IBM MQ Integration with multi-alias connection support.
 
     This library enables easy interaction with IBM MQ message queues from Robot Framework.
 
