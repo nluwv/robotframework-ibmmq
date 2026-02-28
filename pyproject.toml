@@ -39,6 +39,6 @@ deploy = ["twine", "build", "wheel"]
 
 [project.urls]
 Homepage = "https://github.com/nluwv/robotframework-ibmmq"
-Documentation = "https://readthedocs.org"
+Documentation = "https://robotframework-ibmmq.netlify.app/IBMMQLibrary.html"
 Repository = "https://github.com/nluwv/robotframework-ibmmq.git"
 Issues = "https://github.com/nluwv/robotframework-ibmmq/issues"
