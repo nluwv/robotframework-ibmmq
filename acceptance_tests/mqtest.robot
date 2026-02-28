@@ -4,7 +4,7 @@
 
 *** Settings ***
 Library      OperatingSystem
-Library      MQLibrary
+Library      IBMMQLibrary
 Variables    variables/mq_settings.yaml
 
 # robot -d results -L TRACE -P ./src .
