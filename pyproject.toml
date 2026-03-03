@@ -14,13 +14,13 @@ maintainers = [
 description = "A Robotframework library for generation of test data"
 keywords = ["robotframework", "ibm", "mqlibrary"]
 readme = "README.md"
+license = "EUPL-1.2"
 requires-python = ">=3.9.0"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Test engineers",
     "Topic :: Software development :: Testing",
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
     "Operating System :: OS Independent",
 ]
 dependencies = [
