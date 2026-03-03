@@ -1,57 +1,142 @@
-# MQLibrary voor Robot Framework
+# robotframework-ibmmq
 
-## Installatie
+**Robot Framework keywords for IBM MQ — powered by the `ibmmq` Python package.**
 
-Er zijn nogal wat afhankelijkheden met andere componenten die je eerst moet installeren.
+This library is a **thin, explicit Robot Framework wrapper around the `ibmmq` Python package**.
+It does **not** abstract away IBM MQ complexity — and that is **by design**.
 
-# 🧱 Stap 1 — Installeer C++ Build Tools
-1. Open de downloadpagina: Ga naar [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) en download de Visual C++ Build Tools Installer.
-2. Start de installatie: Start het installatieprogramma. Selecteer Visual Studio Build Tools 2026 en klik op Installeren.
-3. Wijzig de installatie (na installatie): Wanneer de Visual Studio Installer opent, klik op Modify bij Build Tools 2026.
-4. In het tabblad Workloads onder de categorie Desktop & Mobile, vink aan: 
-   ✅ Desktop development with C++
-4. Vink nu rechts onder Installation Details de volgende optionele onderdelen aan : (Alle andere optional components mogen uitgevinkt worden)
-   ✅ MSVC Build Tools for x64/86 (latest)
-   ✅ C++ CMake tools for Windows
-   ✅ Windows 11 SDK (v10.0.26...)
-6. Start installatie: Klik rechtsonder op Modify om de installatie te starten.
+If you use this library, you are using **real IBM MQ**, with **real native dependencies**, exactly like production.
 
+---
 
+## What this library is (and is not)
 
-<!-- 
-🧰 Alternatief: zonder Build Tools (optioneel)
-Gebruik dit alleen als Visual Studio Build Tools niet beschikbaar is.
-C++ compiler (LLVM): Download via https://github.com/llvm/llvm-project ➤ Gebruik LLVM-20.1.3-win64.exe → Kies Add to PATH tijdens de installatie
-CMake (Wheel builder): Download via https://cmake.org/download/ ➤ Gebruik cmake-4.0.1-windows-x86_64.msi → Kies Add to PATH tijdens de installatie 
--->
+✅ **IS**
+- A Robot Framework library for **connecting to IBM MQ**
+- A wrapper around the **`ibmmq` Python package**
+- Designed for **real integration testing**, not mocks or file-based substitutes
 
+❌ **IS NOT**
+- A pure-Python library
+- A “just pip install and go” solution
+- A fake or simulated MQ implementation
 
-# 📥 Stap 2 — Installeer de IBMMQLibrary
-1. Open een nieuw terminalvenster
-2. Voer de installatie uit:
-`pip install robotframework-ibmmq`
+If you are looking for something that avoids native dependencies, **this library is not for you**.
 
+---
 
-# 🔐 Extra — MQ Administrator kanaal activeren (alleen indien nodig)
-1. Ga in IBM MQ Explorer naar je Queue Manager
-2. Rechtermuisklik → Remote Administration
-3. Zorg dat de channel én listener bestaan én actief zijn
-4. Gebruik SYSTEM.ADMIN.SVRCONN als channel bij het verbinden
+## 🚨 Read this first: IBM MQ prerequisites are mandatory
 
+This library **directly depends on `ibmmq`**, which is a **Python extension module backed by IBM MQ native libraries**.
 
+> **If `ibmmq` does not work on your machine, this Robot Framework library will not work either.**
 
+Before you do *anything else*, you **must** read and follow the official `ibmmq` prerequisites:
 
+👉 **Official ibmmq prerequisites (REQUIRED):**  
+https://github.com/ibm-messaging/mq-mqi-python?tab=readme-ov-file#prerequisites
+
+### In practical terms, this means:
+
+You **must have**, on the machine where tests run:
+
+- ✅ IBM MQ C Client
+- ✅ IBM MQ SDK
+- ✅ A working C/C++ build toolchain
+- ✅ Correct environment variables (e.g. `MQ_FILE_PATH` if MQ is not installed in the default location)
+
+If any of the above is missing, you will see errors such as:
+
+- `ModuleNotFoundError: No module named 'ibmmqc'`
+- DLL load failures
+- Import errors during `pip install` or at runtime
+
+These are **environment issues**, not bugs in this library.
+
+---
+
+## Platform notes
+
+- ✅ Windows: Supported
+- ✅ Linux: Supported
+- ❌ No native MQ installation = no support
+
+On Windows, a proper **Visual C++ build environment is required**, because `ibmmq` includes native extensions.
+
+---
+
+## Installation
+
+### Step 1 — Verify `ibmmq` works first (strongly recommended)
+
+```bash
+python -c "import ibmmq; print('ibmmq OK')"
+```
+
+If this fails, **stop here** and fix your IBM MQ / `ibmmq` installation first.
+
+### Step 2 — Install this library
+
+```bash
+pip install robotframework-ibmmq
+```
+
+No magic. No hidden installers.
+
+---
+
+## Usage example
+
+```robot
 *** Settings ***
-Library   IBMMQLibrary
+Library    MQLibrary
 
-*** Test cases ***
-Test connect MQ
+*** Test Cases ***
+Connect to IBM MQ
     Connect MQ
-    ...    queue_manager=<QM_ABCD>
-    ...    hostname=uwva2vltunm0123.t-dc.ba.uwv.nl
+    ...    queue_manager=QM_EXAMPLE
+    ...    hostname=mq.example.internal
     ...    port=1414
-    ...    channel=<CHANNEL_NAME>
+    ...    channel=SYSTEM.ADMIN.SVRCONN
     ...    username=${NONE}
     ...    password=${NONE}
-    Disconnect All MQ Connections
 
+    Disconnect All MQ Connections
+```
+
+This connects to a **real queue manager** using a **real MQ channel**.
+
+---
+
+## MQ administration notes
+
+If required:
+
+- Ensure the MQ channel exists and is running
+- Ensure the MQ listener is active
+- Common admin channel: `SYSTEM.ADMIN.SVRCONN`
+
+Use **IBM MQ Explorer** or platform tooling to manage this.
+
+---
+
+## Troubleshooting
+
+Errors mentioning `ibmmqc`, DLL load failures, or missing shared libraries are **IBM MQ / ibmmq environment problems**.
+
+Re-check:
+- IBM MQ installation
+- `ibmmq` prerequisites
+- Environment variables
+- 32-bit vs 64-bit mismatches
+
+Official reference:
+https://github.com/ibm-messaging/mq-mqi-python?tab=readme-ov-file#prerequisites
+
+---
+
+## Acknowledgements ❤️
+
+**Special thanks to UWV** for sponsoring, supporting, and **open-sourcing** this library.
+
+By funding real-world test tooling and releasing it as open source, UWV has contributed back to the broader Robot Framework and IBM MQ communities.
