@@ -1,25 +1,28 @@
 [build-system]
-requires = ["setuptools == 75.4.0"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.10.7,<0.11.0"]
+build-backend = "uv_build"
+
 
 [project]
 name = "robotframework-ibmmq"
-version = "0.1.1"
+version = "0.1.3"
 authors = [
-  { name="Niels Janssen", email="niels.janssen@uwv.nl" },
+  { name="Niels Janssen"},
 ]
 maintainers = [
-  { name="Niels Janssen", email="niels.janssen@uwv.nl" },
+  { name="Niels Janssen"},
 ]
-description = "A Robotframework library for generation of test data"
+description = "A Robotframework library for IBM MQ"
 keywords = ["robotframework", "ibm", "mqlibrary"]
 readme = "README.md"
 license = "EUPL-1.2"
 requires-python = ">=3.9.0"
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "Intended Audience :: Test engineers",
-    "Topic :: Software development :: Testing",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Testing",
+    "Framework :: Robot Framework",
+    "Framework :: Robot Framework :: Library",
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
@@ -42,3 +45,6 @@ Homepage = "https://github.com/nluwv/robotframework-ibmmq"
 Documentation = "https://robotframework-ibmmq.netlify.app/IBMMQLibrary.html"
 Repository = "https://github.com/nluwv/robotframework-ibmmq.git"
 Issues = "https://github.com/nluwv/robotframework-ibmmq/issues"
+
+[tool.uv.build-backend]
+module-name = "IBMMQLibrary"
