@@ -89,7 +89,7 @@ No magic. No hidden installers.
 
 ```robot
 *** Settings ***
-Library    MQLibrary
+Library    IBMMQLibrary
 
 *** Test Cases ***
 Connect to IBM MQ
