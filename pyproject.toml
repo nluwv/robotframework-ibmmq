@@ -27,7 +27,6 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "robotframework (>=7.3.0,<8.3.0)",
     "ibmmq (>=2.0.0,<3.0.0)"
 ]
 
@@ -36,9 +35,32 @@ dev = [
     "pyyaml>=6.0.3",
 ]
 
+deploy = ["twine", "build", "wheel"]
+
 
 [project.optional-dependencies]
-deploy = ["twine", "build", "wheel"]
+rf70 = ["robotframework>=7.0.0,<7.1.0"]
+rf71 = ["robotframework>=7.1.0,<7.2.0"]
+rf72 = ["robotframework>=7.2.0,<7.3.0"]
+rf73 = ["robotframework>=7.3.0,<7.4.0"]
+rf74 = ["robotframework>=7.4.0,<7.5.0"]
+
+[tool.uv]
+conflicts = [
+    [
+        {extra = "rf70"},
+        {extra = "rf71"},
+        {extra = "rf72"},
+        {extra = "rf73"},
+        {extra = "rf74"},
+    ]
+]
+
+[tool.semantic_release]
+commit_parser = "conventional"
+version_toml = ["pyproject.toml:project.version"]
+allow_zero_version = true
+build_command = "uv build"
 
 [project.urls]
 Homepage = "https://github.com/nluwv/robotframework-ibmmq"
