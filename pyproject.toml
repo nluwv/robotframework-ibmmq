@@ -34,7 +34,6 @@ dependencies = [
 dev = [
     "pyyaml>=6.0.3",
 ]
-build = ["python-semantic-release>=10.5.3"]
 
 deploy = ["twine", "build", "wheel"]
 
