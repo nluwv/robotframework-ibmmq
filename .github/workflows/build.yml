@@ -1,0 +1,132 @@
+name: Tests and Build
+
+on: 
+ push:
+  branches:
+    - main
+
+jobs:
+  comp_test:
+    name: Exeute Tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+            python-version:
+              - "3.10"
+              - "3.11"
+              - "3.12"
+              - "3.13"
+              - "3.14"
+            rf_version:
+              - "rf70"
+              - "rf71"
+              - "rf72"
+              - "rf73"
+              - "rf74"
+    env:
+         UV_PROJECT_ENVIRONMENT: .venv-${{ matrix.python-version }}-${{ matrix.rf_version }}
+         
+    steps:
+        - uses: actions/checkout@v6
+          with:
+            persist-credentials: false
+        - name: Setup UV
+          uses: astral-sh/setup-uv@v7.6.0
+          with:
+            version: 0.11.2
+            python-version: ${{ matrix.python-version}}
+
+        - name: install project
+          run: uv sync --extra ${{ matrix.rf_version}} --no-dev
+
+        - name: run Test
+          run: uv run --no-sync robot acceptance_tests/mqtest.robot
+
+  build:
+    needs: comp_test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up uv and python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: 3.13
+
+      - name: Run semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: | #shell
+          sr() {
+            uvx --from="python-semantic-release@9.21.1" semantic-release "$@"
+          }
+
+          sr version
+          sr publish
+
+
+
+  release_testpypi:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      id-token: write   # needed for trusted publisher
+
+    environment: 'testpypi'
+
+    steps:
+      - name: Checkout exact release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish | TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+  
+  acceptance:
+    needs: release_testpypi
+    name: Test Package Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.14"
+
+    - name: create and activate venv
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        which python
+        
+    - name: Install dependencies
+      run: |
+        pip install robotframework
+        pip install ibmmq
+        pip install --index-url pip install -i https://test.pypi.org/simple/ robotframework-ibmmq
+        ``
+
+    - name: Validate Keywords exist
+      run: python -m robot.libdoc IBMMQLibrary list
+        
+    - name: Test with robot
+      run: |
+        python -m robot acceptance_tests/mqtest.robot

@@ -1,0 +1,73 @@
+name: Publish to PyPi
+
+on:
+  # Manual Dispatch of release
+ workflow_dispatch:
+    inputs:
+      target:
+        description: "Publish target"
+        required: true
+        type: choice
+        default: pypi
+        options:
+          - pypi
+       
+permissions:
+  contents: read
+  id-token: write   # nodig voor trusted publishing
+
+jobs:
+  publish_pypi:
+    runs-on: ubuntu-latest
+
+    # Dynamisch environment kiezen
+    environment: 'pypi'
+
+    steps:
+      - name: Checkout exact release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish | PyPi
+        uses: pypa/gh-action-pypi-publish@release/v1
+  
+  create_documents:
+    needs: publish_pypi
+    runs-on: ubuntu-latest
+    name: 'Deploy Documentation'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v7.6.0
+        with:
+          version: 0.11.2
+          python-version: 3.14
+
+      - name: install project
+        run: uv sync
+
+      - name: Generate Robot Framework Libdoc
+        run: |
+          VERSION=$(uv version --short)
+          uv run libdoc --version "$VERSION" src/IBMMQLibrary docs/IBMMQLibrary.html
+
+      - uses: jsmrcaga/action-netlify-deploy@master
+        with:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_DEPLOY_MESSAGE: "Deploy v${{ github.ref }}"
+          NETLIFY_DEPLOY_TO_PROD: true
+
