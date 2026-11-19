@@ -1,7 +1,12 @@
 import os
 import subprocess
 
-import ibmmq
+# Detect if legacy backend is available otherwise use ibmmq
+try:
+    import pymqi as ibmmq
+except ImportError:
+    import ibmmq
+
 from robot.api import logger
 from robot.api.deco import keyword, library
 from robot.utils import timestr_to_secs
