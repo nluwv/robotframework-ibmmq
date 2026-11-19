@@ -56,6 +56,16 @@ class IBMMQLibrary:
             if codepage == 65001:
                 logger.warn("This shell uses codepage 65001, which is not supported by MQ, you will likely encounter error: 2539: MQRC_CHANNEL_CONFIG_ERROR.\n Use `chcp 437` in your shell to switch to a compatible codepage.")
 
+    @staticmethod
+    def __decode_message(message):
+        try:
+            decoded = message.decode("utf-8")
+        except UnicodeDecodeError:
+            logger.warn("UTF-8 decoding failed, falling back to ISO-8859-1.")
+            decoded = message.decode("iso-8859-1")
+        return decoded
+        
+
     @keyword(name="Connect MQ", tags=["Connection"])
     def connect_mq(self, queue_manager: str, hostname: str, port: int, channel: str, username: str | None = None, password: str | None = None, alias: str = "default"):
         """
@@ -173,11 +183,7 @@ class IBMMQLibrary:
                 md = _new_md()
                 try:
                     message = queue_obj.get(None, md, gmo)
-                    try:
-                        decoded = message.decode("utf-8")
-                    except UnicodeDecodeError:
-                        logger.warn("UTF-8 decoding failed, falling back to ISO-8859-1.")
-                        decoded = message.decode("iso-8859-1")
+                    decoded = self.__decode_message(message)
                     messages.append(decoded)
                     logger.info(f"Received message from queue '{queue}': {decoded}")
                 except ibmmq.MQMIError as e:
@@ -191,6 +197,51 @@ class IBMMQLibrary:
             message = f"Expected {message_amount} message(s), but received {len(messages)}."
             logger.error(message)
             raise AssertionError(message)
+        finally:
+            if queue_obj:
+                queue_obj.close()
+
+
+    @keyword(name="Get all MQ Messages", tags=["Retrieve"])
+    def get_all_messages(self, queue: str, convert: bool = True, timeout: str = 0, alias: str = "default") -> list:
+        """
+        Retrieves all messages from a queue and returns it as a list.
+        Removes the messages from the queue on retrieval.
+
+        | =Argument=         | =Description=                                       |
+        | ``queue``          | Queue to read messages from                         |
+        | ``convert``        | Convert message (MQGMO_CONVERT) if True             |
+        | ``timeout``        | Timeout per message in seconds (default = 0)        |
+        | ``alias``          | Alias of the MQ connection (default = "default")    |
+
+        === Example ===
+        | ${msgs}    `Get all MQ Messages`    queue=QUEUE.TEST    timeout=2
+        """
+        qmgr = self._get_qmgr(alias)
+        queue_obj = None
+        messages = []
+        try:
+            gmo = ibmmq.GMO()
+            gmo.Options = ibmmq.CMQC.MQGMO_WAIT | (ibmmq.CMQC.MQGMO_CONVERT if convert else 0)
+
+            timeout_ms = int(timestr_to_secs(timeout) * 1000)
+            gmo.WaitInterval = timeout_ms
+
+            queue_obj = ibmmq.Queue(qmgr, queue)
+            while True:
+                md = _new_md()
+                try:
+                    message = queue_obj.get(None, md, gmo)
+                    decoded = self.__decode_message(message)
+                    messages.append(decoded)
+                    logger.info(f"Received message from queue '{queue}': {decoded}")
+                except ibmmq.MQMIError as e:
+                    if e.reason == ibmmq.CMQC.MQRC_NO_MSG_AVAILABLE:
+                        logger.info(f"No more messages available on queue '{queue}'.")
+                        break
+                    logger.error(f"Failed to get message from queue '{queue}': {e}")
+                    raise
+            return messages
         finally:
             if queue_obj:
                 queue_obj.close()
@@ -229,11 +280,7 @@ class IBMMQLibrary:
                 md = _new_md()
                 try:
                     message = queue_obj.get(None, md, gmo)
-                    try:
-                        decoded = message.decode("utf-8")
-                    except UnicodeDecodeError:
-                        logger.warn("UTF-8 decoding failed, falling back to ISO-8859-1.")
-                        decoded = message.decode("iso-8859-1")
+                    decoded = self.__decode_message(message)
                     messages.append(decoded)
                     logger.info(f"Browsed message {i + 1}: {decoded}")
                 except ibmmq.MQMIError as e:
