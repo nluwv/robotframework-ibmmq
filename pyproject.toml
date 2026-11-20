@@ -39,6 +39,7 @@ dev = [
 
 [project.optional-dependencies]
 deploy = ["twine", "build", "wheel"]
+legacy_backend = ["pymqi"]
 
 [project.urls]
 Homepage = "https://github.com/nluwv/robotframework-ibmmq"
